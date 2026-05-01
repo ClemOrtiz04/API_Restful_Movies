@@ -3,7 +3,9 @@ import sequelize from './modules/db.js';
 import logger from './middlewares/logger.js';
 import validarApiKey from './middlewares/validarApiKey.js';
 import peliculaRoutes from './routes/route-pelicula.js';
- 
+import verificarToken from './middlewares/validationToken.js';
+import authRoutes from './services/serv.token.js';
+
 const app = express();
 const PORT = process.env.PORT || 3000;
  
@@ -16,19 +18,23 @@ app.get('/', (req, res) => {
   res.json({
     mensaje: 'API RESTful de Películas',
     version: '1.0.0',
-    autenticacion: 'Envía tu API Key como ?key=TU_KEY o en el header x-api-key',
+    autenticacion: 'Primero haz POST /login con credenciales para obtener token JWT',
     endpoints: {
-      'GET    /peliculas':      'Obtener todas las películas',
-      'GET    /peliculas/:id':  'Obtener una película por ID',
-      'POST   /peliculas':      'Crear una película',
-      'PUT    /peliculas/:id':  'Actualizar una película',
-      'DELETE /peliculas/:id':  'Eliminar una película',
+      'POST   /login':          'Obtener JWT token (username: cortiz18, password: clemente18)',
+      'GET    /peliculas':      'Obtener todas las películas (requiere token)',
+      'GET    /peliculas/:id':  'Obtener una película por ID (requiere token)',
+      'POST   /peliculas':      'Crear una película (requiere token)',
+      'PUT    /peliculas/:id':  'Actualizar una película (requiere token)',
+      'DELETE /peliculas/:id':  'Eliminar una película (requiere token)',
     },
   });
 });
  
-// validarApiKey aplicado a todas las rutas de /peliculas
-app.use('/peliculas', validarApiKey, peliculaRoutes);
+// Rutas de autenticación (SIN protección de token)
+app.use('/', authRoutes);
+ 
+// Middleware validarApiKey y verificarToken aplicados a todas las rutas de /peliculas
+app.use('/peliculas', validarApiKey, verificarToken, peliculaRoutes);
  
 // Ruta no encontrada
 app.use((req, res) => {
