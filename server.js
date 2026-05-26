@@ -12,6 +12,18 @@ const PORT = process.env.PORT || 3000;
 // Middlewares globales
 app.use(express.json());
 app.use(logger); // Se aplica a TODAS las rutas
+
+// Sincronizar BD y arrancar
+try {
+  await sequelize.authenticate();
+  console.log('Conexión con PostgreSQL establecida correctamente.');
+
+  await sequelize.sync();
+
+} catch (error) {
+  console.error('Error al inicializar la base de datos:', error);
+}
+
  
 // Ruta de salud (sin autenticación)
 app.get('/', (req, res) => {
@@ -47,17 +59,5 @@ app.use((err, req, res, next) => {
   res.status(500).json({ error: 'Error interno del servidor', detalle: err.message });
 });
  
-// Sincronizar BD y arrancar
-try {
-  await sequelize.authenticate();
-  console.log('Conexión con PostgreSQL establecida correctamente.');
 
-  await sequelize.sync();
-
-  app.listen(PORT, () => {
-    console.log(`Servidor ejecutándose en el puerto ${PORT}`);
-  });
-
-} catch (error) {
-  console.error('Error al inicializar la base de datos:', error);
-}
+app.listen(process.env.PORT || 3000, () => console.log(`Servidor ejecutándose en el puerto ${process.env.PORT || 3000}`));
