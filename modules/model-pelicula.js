@@ -34,7 +34,7 @@ const Pelicula = sequelize.define('Pelicula', {
   },
 }, {
   tableName: 'peliculas',
-  timestamps: true,
+  timestamps: false,
 });
 
 export default Pelicula;

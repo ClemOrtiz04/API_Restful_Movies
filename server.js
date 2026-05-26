@@ -48,16 +48,12 @@ app.use((err, req, res, next) => {
 });
  
 // Sincronizar BD y arrancar
-sequelize.sync({ alter: true })
-  .then(() => {
-    console.log('Base de datos SQLite sincronizada');
-    app.listen(PORT, () => {
-      console.log(`Servidor corriendo en http://localhost:${PORT}`);
-      console.log(`API Key activa: ${process.env.API_KEY || '12345'}`);
-    });
-  })
-  .catch((err) => {
-    console.error('Error al conectar la base de datos:', err);
-  });
+try {
+  await sequelize.authenticate();
+  console.log('Conexión con PostgreSQL establecida correctamente.');
+  await sequelize.sync(); // Crea la tabla en la nube si no existe
+} catch (error) {
+  console.error('Error al inicializar la base de datos:', error);
+}
  
 export default app;
