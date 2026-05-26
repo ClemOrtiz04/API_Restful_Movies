@@ -51,9 +51,13 @@ app.use((err, req, res, next) => {
 try {
   await sequelize.authenticate();
   console.log('Conexión con PostgreSQL establecida correctamente.');
-  await sequelize.sync(); // Crea la tabla en la nube si no existe
+
+  await sequelize.sync();
+
+  app.listen(PORT, () => {
+    console.log(`Servidor ejecutándose en el puerto ${PORT}`);
+  });
+
 } catch (error) {
   console.error('Error al inicializar la base de datos:', error);
 }
- 
-export default app;
